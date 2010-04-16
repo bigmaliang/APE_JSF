@@ -13,7 +13,7 @@ APE.Core = new Class({
 		this.addEvent('uniPipeCreate', this.saveSessionPipe);
 		this.addEvent('uniPipeDelete', this.saveSessionPipe);
 	},
-	
+
 	saveSessionPipe:function(){
 		var uniPipe = [];
 		this.pipes.each(function(pipe) {
@@ -43,7 +43,7 @@ APE.Core = new Class({
 	},
 
 	restoreCallback: function(resp){
-		if (resp.raw!='ERR' && this.status == 0) { 
+		if (resp.raw!='ERR' && this.status == 0) {
 			this.fireEvent('init');
 			this.fireEvent('ready');
 			this.status = 1;
@@ -75,7 +75,11 @@ APE.Core = new Class({
 	 * @return 	Boolean	false if application identifier isn't found or an object with the instance and the cookie
 	 */
 	getInstance: function(identifier) {
-		var	tmp = Cookie.read('APE_Cookie', {'domain': document.domain});
+		var domain = document.domain;
+		if (this.options.transport == 2) {
+			domain = this.options.domain;
+		}
+		var tmp = Cookie.read('APE_Cookie', {'domain': domain});
 		identifier = identifier || this.options.identifier;
 		if (!tmp) return false;
 		tmp = JSON.parse(tmp);
@@ -87,11 +91,11 @@ APE.Core = new Class({
 				return {instance: tmp.instance[i], cookie: tmp};
 			}
 		}
-		
+
 		//No instance found, just return the cookie
 		return {cookie: tmp};
 	},
-	
+
 	removeInstance: function(identifier){
 		if (!this.cookie) return;
 
@@ -156,7 +160,11 @@ APE.Core = new Class({
 
 	saveCookie: function(){
 		//Save cookie on the parent window (this is usefull with JSONP as domain in the iframe is different than the domain in the parent window)
-		Cookie.write('APE_Cookie', JSON.stringify(this.cookie), {'domain': document.domain});
+		var domain = document.domain;
+		if (this.options.transport == 2) {
+			domain = this.options.domain;
+		}
+		Cookie.write('APE_Cookie', JSON.stringify(this.cookie), {'domain': domain, 'path': '/'});
 	},
 
 	clearSession: function(){
