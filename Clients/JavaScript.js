@@ -7,7 +7,7 @@ var APE = {
 	},
 
 	Client: function(core) {
-			if(core) this.core = core;
+			if(core) this.core = core;	
 	}
 }
 APE.Client.prototype.eventProxy = [];
@@ -31,23 +31,22 @@ APE.Client.prototype.removeEvent = function(type, fn) {
 }
 
 APE.Client.prototype.onRaw = function(type, fn, internal) {
-		this.addEvent('raw_' + type.toLowerCase(), fn, internal);
+		this.addEvent('raw_' + type.toLowerCase(), fn, internal); 
 }
 
 APE.Client.prototype.onCmd = function(type, fn, internal) {
-		this.addEvent('cmd_' + type.toLowerCase(), fn, internal);
+		this.addEvent('cmd_' + type.toLowerCase(), fn, internal); 
 }
 
 APE.Client.prototype.onError = function(type, fn, internal) {
-		this.addEvent('error_' + type, fn, internal);
+		this.addEvent('error_' + type, fn, internal); 
 }
 
 APE.Client.prototype.cookie = {};
 
-APE.Client.prototype.cookie.write = function (name, value, domain) {
-	   if (domain == 'auto') domain = document.domain;
-	   document.cookie = name + "=" + encodeURIComponent(value) + ";path=/ ; domain=" + domain;
- }
+APE.Client.prototype.cookie.write = function (name, value) {
+	document.cookie = name + "=" + encodeURIComponent(value) + "; domain=" + document.domain;
+}
 
 APE.Client.prototype.cookie.read = function (name) {
 	var nameEQ = name + "=";
@@ -98,7 +97,7 @@ APE.Client.prototype.load = function(config){
 
 	var reg = new RegExp('"frequency":([ 0-9]+)' , "g")
 	cookie = cookie.replace(reg, '"frequency":' + config.frequency);
-	this.cookie.write('APE_Cookie', cookie, config.domain);
+	this.cookie.write('APE_Cookie', cookie);
 
 	var iframe = document.createElement('iframe');
 	iframe.setAttribute('id','ape_' + config.identifier);
@@ -108,6 +107,11 @@ APE.Client.prototype.load = function(config){
 	iframe.style.top = '-300px';
 
 	document.body.insertBefore(iframe,document.body.childNodes[0]);
+
+	iframe.onload = function() { 
+		if (!iframe.contentWindow.APE) setTimeout(iframe.onload, 100);//Sometimes IE fire the onload event, but the iframe is not loaded -_-
+		else iframe.contentWindow.APE.init(config);
+	}
 
 	if (config.transport == 2) {
 		var doc = iframe.contentDocument;
@@ -125,19 +129,12 @@ APE.Client.prototype.load = function(config){
 		doc.close();
 	} else {
 		iframe.setAttribute('src',(config.secure ? 'https': 'http') + '://' + config.frequency + '.' + config.server + '/?[{"cmd":"script","params":{"domain":"' + document.domain +'","scripts":["' + config.scripts.join('","') + '"]}}]');
-		if (navigator.product == 'Gecko') {
-			//Firefox fix, see bug #356558
+		if (navigator.product == 'Gecko') { 
+			//Firefox fix, see bug #356558 
 			// https://bugzilla.mozilla.org/show_bug.cgi?id=356558
 			iframe.contentWindow.location.href = iframe.getAttribute('src');
 		}
 	}
-
-	onIframeLoad = function() {
-		if (!iframe.contentWindow.APE) setTimeout(onIframeLoad, 100);//Sometimes IE fire the onload event, but the iframe is not load
-			else iframe.contentWindow.APE.init(config);
-	};
-
-	setTimeout(onIframeLoad, 100);
 
 }
 
