@@ -2060,6 +2060,8 @@ APE.Core = new Class({
 	rawIdent: function(raw){
 		this.user = raw.data.user;
 		this.pubid = raw.data.user.pubid;
+		this.user.pipes = new $H;
+		this.users.set(this.pubid, this.user);
 	},
 
 	rawLogin: function(param){
@@ -2294,15 +2296,17 @@ APE.PipeMulti = new Class({
 		this.ape.left(this.pipe.pubid);
 	},
 
-	addUser: function(pubid, user) {
-		if (!this.ape.users.has(user.pubid)) {
+	addUser: function(pubid, updatedUser) {
+		var user;
+		if (!this.ape.users.has(pubid)) {
+			user = updatedUser;
 			user.pipes = new $H;
-			this.ape.users.set(pubid, user);
+			this.ape.users.set(pubid, updatedUser);
 		} else {
 			user = this.ape.users.get(pubid);
 		}
 		user.pipes.set(this.pipe.pubid, this);
-		var u = {'pipes':user.pipes ,'casttype': user.casttype, 'pubid': user.pubid, 'properties': user.properties};
+		var u = {'pipes':user.pipes ,'casttype': user.casttype, 'pubid': user.pubid, 'properties': updatedUser.properties};
 		this.users.set(pubid, u);
 		this.fireGlobalEvent('userJoin', [u, this]);
 		return u;
@@ -2864,6 +2868,68 @@ APE.Transport.JSONP = new Class({
 });
 
 APE.Transport.JSONP.browserSupport = function() { return true };
+APE.Transport.WebSocket = new Class({
+
+	stack: [],
+	connRunning: false,
+
+	initialize: function(ape) {
+		this.ape = ape;
+		this.initWs();
+	},
+
+	initWs: function() {
+		this.ws = new WebSocket( (this.ape.options.secure ? 'wss' : 'ws') + '://' + this.ape.options.frequency + '.' + this.ape.options.server + '/' + this.ape.options.transport +'/');
+		this.connRunning = true;
+		this.ws.onmessage = this.readWs.bind(this);
+		this.ws.onopen = this.openWs.bind(this);
+		this.ws.onclose = this.closeWs.bind(this);
+		this.ws.onerror = this.errorWs.bind(this);
+	},
+
+	readWs: function(evt) {
+		this.ape.parseResponse(evt.data, this.callback);
+		this.callback = null;
+	},
+
+	openWs: function() {
+		if (this.stack.length > 0) {
+			for (var i = 0; i < this.stack.length; i++) this.send(this.stack[i].q, this.stack[i].options);
+			this.stack.length = 0;
+		}
+	},
+
+	closeWs: function() {
+		this.connRunning = false;
+	},
+
+	errorWs: function() {
+		this.connRunning = false;
+	},
+
+	send: function(queryString, options) {
+		if (this.ws.readyState == 1) {
+			if (options.requestCallback) this.callback = options.requestCallback;
+			this.ws.send(queryString);
+		} else {//ws not connect, stack request
+			this.stack.push({'q': queryString, 'options': options});
+		}
+	},
+
+	running: function() {
+		return this.connRunning;
+	},
+
+	cancel: function() {
+		this.ws.close();
+	}
+
+});
+
+APE.Transport.WebSocket.browserSupport = function() {
+	if ('WebSocket' in window) return true;
+	else return 1;//No websocket support switch to XHRStreaming
+}
 String.implement({
 
 	addSlashes: function(){
@@ -2937,24 +3003,29 @@ var B64 = new Hash({
 		return out.join(''); //  string
 	}
 });
-//Override setInterval to be done outside the frame (there is some issue inside the frame with FF3 and WebKit)
-if (!Browser.Engine.trident && !Browser.Engine.presto && !(Browser.Engine.gecko && Browser.Engine.version<=18)) {
-	setInterval = function(fn,time) {
-		return window.parent.setInterval(fn, time);
-	};
-	
-	setTimeout = function(fn,time) {
-		return window.parent.setTimeout(fn, time);
-	};
-	
-	clearInterval = function(id) {
-		return window.parent.clearInterval(id);
-	};
-	
-	clearTimeout = function(id) {
-		return window.parent.clearTimeout(id);
-	};
-}
+try {
+	//Avoid showing error if window.parent.setInterval() is not working (ie : permission denied)
+	window.parent.setInterval();
+
+	//Override setInterval to be done outside the frame (there is some issue inside the frame with FF3 and WebKit)
+	if (!Browser.Engine.trident && !Browser.Engine.presto && !(Browser.Engine.gecko && Browser.Engine.version<=18)) {
+		setInterval = function(fn,time) {
+			return window.parent.setInterval(fn, time);
+		};
+		
+		setTimeout = function(fn,time) {
+			return window.parent.setTimeout(fn, time);
+		};
+		
+		clearInterval = function(id) {
+			return window.parent.clearInterval(id);
+		};
+		
+		clearTimeout = function(id) {
+			return window.parent.clearTimeout(id);
+		};
+	}
+} catch (e) {};
 /*
     http://www.JSON.org/json2.js
     2009-09-29
