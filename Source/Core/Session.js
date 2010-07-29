@@ -156,7 +156,7 @@ APE.Core = new Class({
 
 	saveCookie: function(){
 		//Save cookie on the parent window (this is usefull with JSONP as domain in the iframe is different than the domain in the parent window)
-		Cookie.write('APE_Cookie', JSON.stringify(this.cookie), {'domain': document.domain});
+		Cookie.write('APE_Cookie', JSON.stringify(this.cookie), {'domain': document.domain, 'path': '/'});
 	},
 
 	clearSession: function(){
