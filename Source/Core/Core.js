@@ -242,7 +242,7 @@ APE.Core = new Class({
 
 	newPipe: function(type, options){
 		if (options && options.pipe.pubid) {
-			var pipe = this.pipes.get(options.pipe.pubid)
+			var pipe = this.pipes.get(options.pipe.pubid);
 			if (pipe) return pipe;
 		} 
 
@@ -336,8 +336,8 @@ APE.Core = new Class({
 
 		if (callback) {
 			requestOption.callback = function(resp) { 
-				if (resp.raw == 'SESSIONS') this.apply(null, arguments) 
-			}.bind(callback)
+				if (resp.raw == 'SESSIONS') {this.apply(null, arguments);}
+			}.bind(callback);
 		}
 		requestOption.requestCallback = option.requestCallback || null;
 
@@ -399,4 +399,4 @@ APE.init = function(config){
 	(function() {
 		new APE.Core(config);
 	}).delay(1);
-}
+};
