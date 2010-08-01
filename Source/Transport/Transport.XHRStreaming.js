@@ -47,7 +47,7 @@ APE.Transport.XHRStreaming = new Class({
 			cleanClose: false,
 			forceClose: false,
 			callback: null
-		}
+		};
 	},
 
 	send: function(queryString, options) {
@@ -187,5 +187,5 @@ APE.Transport.XHRStreaming.browserSupport = function() {
 		*/
 	} else if (Browser.Features.xhr) return 0;//No XHRStreaming support switch to long polling
 	else return 2;//No XHR Support, switch to JSONP
-}
+};
 

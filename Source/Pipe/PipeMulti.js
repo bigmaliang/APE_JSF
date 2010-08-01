@@ -59,7 +59,7 @@ APE.PipeMulti = new Class({
 	delUser: function(pubid) {
 		var u = this.users.get(pubid);
 		this.users.erase(pubid);
-		u.pipes.erase(this.pipe.pubid)
+		u.pipes.erase(this.pipe.pubid);
 		if (u.pipes.getLength() == 0) {
 			this.ape.users.erase(u.pubid);
 		}

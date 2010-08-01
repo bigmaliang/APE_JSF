@@ -35,7 +35,7 @@ APE.Pipe  = new Class({
 				}.bind(this),
 				send: this.ape.request.stack.send.bind(this.ape.request.stack)
 			}
-		}
+		};
 	},
 
 	parsePipeCmd: function() {

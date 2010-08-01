@@ -7,6 +7,6 @@ APE.Request.SSE = new Class({
 		document.body.appendChild(tmp);
 		tmp.innerHTML = '<event-source src="' + this.ape.serverUri + queryString + '&' + $time() + '" id="APE_SSE">';
 		this.eventSource = document.getElementById('APE_SSE');
-		this.eventSource.addEventListener('ape-data', function(ev) { readCallback.run(ev.data) }, false);
+		this.eventSource.addEventListener('ape-data', function(ev) { readCallback.run(ev.data); }, false);
 	}
 });

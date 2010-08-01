@@ -53,7 +53,7 @@ APE.Request = new Class({
 				o.chl = this.chl++;
 				if (!tmp.options) tmp.options = {};
 
-				tmp.params ? o.params = tmp.params : null;
+				o.params = tmp.params ? tmp.params : null;
 				evParams = $extend({}, o.params);
 
 
@@ -82,7 +82,7 @@ APE.Request = new Class({
 			o.cmd = cmd;
 			o.chl = this.chl++;
 
-			params ? o.params = params : null;
+			params = o.params ? o.params : null;
 			var evParams = $extend({}, params);
 
 

@@ -46,7 +46,7 @@ APE.PipeProxy = new Class({
 		switch (resp.data.event) {
 			case 'read':
 				var data = B64.decode(resp.data.data);
-				this.fireGlobalEvent('proxyRead', data)
+				this.fireGlobalEvent('proxyRead', data);
 				if (this.onread) this.onread(data);
 				break;
 			case 'connect':

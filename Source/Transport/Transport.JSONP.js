@@ -88,4 +88,4 @@ APE.Transport.JSONP = new Class({
 	
 });
 
-APE.Transport.JSONP.browserSupport = function() { return true };
+APE.Transport.JSONP.browserSupport = function() { return true; };

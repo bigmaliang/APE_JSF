@@ -59,4 +59,4 @@ APE.Transport.WebSocket = new Class({
 APE.Transport.WebSocket.browserSupport = function() {
 	if ('WebSocket' in window) return true;
 	else return 1;//No websocket support switch to XHRStreaming
-}
+};
