@@ -53,6 +53,15 @@ APE.Core = new Class({
 	},
 
 	connect: function(args, options){
+		var that = this,
+		c = Cookie.read('APE_Connect', {'domain': document.domain});
+		//c && this.connect.delay(3000, this, [args, options]);
+		if (c) {
+			setTimeout(function() {
+				that.connect.call(that, args, options);
+			}, 3000);
+			return;
+		}
 		var cookie = this.initCookie();
 		if (!cookie) {//No cookie defined start a new connection
 			this.addEvent('init',this.init);
