@@ -294,7 +294,11 @@ APE.Core = new Class({
 		if (!options) options = {};
 		options.sessid = false;
 
-		Cookie.write('APE_Connect', '1', {'domain': document.domain, 'path': '/'});;
+		Cookie.write('APE_Connect', '1', {
+			'domain': document.domain,
+			'path': '/',
+			'duration': (1/24/60/6)
+		});;
 		this.request.stack.add('CONNECT', args, options);
 		if (this.options.channel) { 
 			this.request.stack.add('JOIN', {"channels": this.options.channel}, options);
