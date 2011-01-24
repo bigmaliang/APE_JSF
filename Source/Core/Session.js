@@ -55,8 +55,8 @@ APE.Core = new Class({
 	connect: function(args, options){
 		var that = this,
 		c = Cookie.read('APE_Connect', {'domain': document.domain});
-
-		if (this.options.reload && c) {
+		//c && this.connect.delay(3000, this, [args, options]);
+		if (c) {
 			setTimeout(function() {
 				that.connect.call(that, args, options);
 			}, 3000);
