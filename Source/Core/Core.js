@@ -294,7 +294,6 @@ APE.Core = new Class({
 		if (!options) options = {};
 		options.sessid = false;
 
-		Cookie.write('APE_Connect', '1', {'domain': document.domain, 'path': '/'});;
 		this.request.stack.add('CONNECT', args, options);
 		if (this.options.channel) { 
 			this.request.stack.add('JOIN', {"channels": this.options.channel}, options);
@@ -366,8 +365,6 @@ APE.Core = new Class({
 		this.startPoller();
 		this.fireEvent('ready');
 		this.fireEvent('init');
-		//Cookie.dispose('APE_Connect', {'domain': document.domain});
-		document.cookie = 'APE_Connect="";expires='+ new Date().toUTCString() +';domain='+ document.domain +';path="/"' 
 	},
 
 	rawErr: function(err){
