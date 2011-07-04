@@ -9,7 +9,9 @@ APE.Transport.WebSocket = new Class({
 	},
 
 	initWs: function() {
-		this.ws = new WebSocket( (this.ape.options.secure ? 'wss' : 'ws') + '://' + this.ape.options.frequency + '.' + this.ape.options.server + '/' + this.ape.options.transport +'/');
+		var uri = (this.ape.options.secure ? 'wss' : 'ws') + '://' + this.ape.options.frequency + '.' + this.ape.options.server + '/' + this.ape.options.transport +'/';
+
+		this.ws = ('MozWebSocket' in window ? new MozWebSocket(uri) : new WebSocket(uri));
 		this.connRunning = true;
 		this.ws.onmessage = this.readWs.bind(this);
 		this.ws.onopen = this.openWs.bind(this);
@@ -57,6 +59,6 @@ APE.Transport.WebSocket = new Class({
 });
 
 APE.Transport.WebSocket.browserSupport = function() {
-	if ('WebSocket' in window) return true;
+	if ('WebSocket' in window || 'MozWebSocket' in window) return true;
 	else return 1;//No websocket support switch to XHRStreaming
 }
